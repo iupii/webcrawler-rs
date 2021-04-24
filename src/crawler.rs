@@ -22,6 +22,20 @@ impl Crawler {
         Crawler { base, limit }
     }
 
+    pub fn run<T: HTTPClient>(&self, http_client: &T) {
+        let (links, fails) = self.crawl(http_client);
+        println!("links {:?}:", links.len());
+        for link in links {
+            println!("\t{:?}", link);
+        }
+        if !fails.is_empty() {
+            println!("\nwith fails {:?}:", fails.len());
+            for (link, err) in fails {
+                println!("\t{:?}: {:?}", link, err);
+            }
+        }
+    }
+
     fn init(&self, links: &mut HashSet<String>, worker: &Worker<String>) -> i32 {
         let url = String::from(self.base.as_str());
         worker.push(url.clone());
@@ -36,20 +50,6 @@ impl Crawler {
             remaining += 1;
         }
         remaining
-    }
-
-    pub fn run<T: HTTPClient>(&self, http_client: &T) {
-        let (links, fails) = self.crawl(http_client);
-        println!("links {:?}:", links.len());
-        for link in links {
-            println!("\t{:?}", link);
-        }
-        if !fails.is_empty() {
-            println!("\nwith fails {:?}:", fails.len());
-            for (link, err) in fails {
-                println!("\t{:?}: {:?}", link, err);
-            }
-        }
     }
 
     fn crawl<T: HTTPClient>(&self, http_client: &T) -> (HashSet<String>, Vec<(String, String)>) {
@@ -107,7 +107,7 @@ impl Crawler {
     }
 }
 
-pub fn get_internal_links(base: &Url, html: &str) -> HashSet<String> {
+fn get_internal_links(base: &Url, html: &str) -> HashSet<String> {
     let document = Html::parse_document(html);
     let selector = Selector::parse("a").unwrap();
     document

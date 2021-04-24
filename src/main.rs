@@ -36,11 +36,10 @@ fn main() {
     let mut url = Url::parse(url).unwrap_or_else(|e| {
         panic!("error: {}", e);
     });
-    url.set_fragment(None);
-
     let _domain = url.domain().unwrap_or_else(|| {
         panic!("error: Domain expected");
     });
+    url.set_fragment(None);
 
     Crawler::new(url, limit).run(&Reqwest);
 }
