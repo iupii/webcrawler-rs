@@ -4,7 +4,6 @@ pub trait HTTPClient: Send + Sync {
     fn fetch(&self, url: &str) -> Result<String, String>;
 }
 
-// #[derive(Send)]
 pub struct Reqwest;
 
 impl HTTPClient for Reqwest {

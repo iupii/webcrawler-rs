@@ -87,7 +87,6 @@ impl Crawler {
                         remaining -= 1;
                         for link in new_links {
                             if links.insert(link.clone()) {
-                                // println!("{:?}", &link);
                                 worker.push(link);
                                 remaining += 1;
                             }
@@ -100,7 +99,6 @@ impl Crawler {
                 }
             }
             is_done.store(true, SeqCst);
-            // println!("{:?}\n{:?}\n", links, fails);
             (links, fails)
         })
         .unwrap()
