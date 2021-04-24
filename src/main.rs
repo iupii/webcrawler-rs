@@ -2,7 +2,7 @@
 use clap::{value_t_or_exit, App, Arg};
 use url::Url;
 
-use crate::crawler::*;
+use crate::crawler::Crawler;
 use crate::http_client::Reqwest;
 
 mod crawler;

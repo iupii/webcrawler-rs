@@ -36,20 +36,19 @@ impl Crawler {
         }
     }
 
-    fn init(&self, links: &mut HashSet<String>, worker: &Worker<String>) -> i32 {
+    fn init(&self, worker: &Worker<String>) -> HashSet<String> {
+        let mut links = HashSet::new();
         let url = String::from(self.base.as_str());
-        worker.push(url.clone());
-        links.insert(url);
-        let mut remaining = 1;
+        links.insert(url.clone());
+        worker.push(url);
         if self.base.path() != "/" || self.base.query().is_some() {
             let mut url = self.base.join("/").unwrap();
             url.set_query(None);
             let url = url.into_string();
-            worker.push(url.clone());
-            links.insert(url);
-            remaining += 1;
+            links.insert(url.clone());
+            worker.push(url);
         }
-        remaining
+        links
     }
 
     fn crawl<T: HTTPClient>(&self, http_client: &T) -> (HashSet<String>, Vec<(String, String)>) {
@@ -72,7 +71,7 @@ impl Crawler {
                                     sender.send(Ok(links)).unwrap();
                                 }
                                 Err(err) => {
-                                    sender.send(Err((link.clone(), err))).unwrap();
+                                    sender.send(Err((link, err))).unwrap();
                                 }
                             }
                         }
@@ -80,9 +79,9 @@ impl Crawler {
                 });
             }
 
-            let mut links = HashSet::new();
+            let mut links = self.init(&worker);
             let mut fails = Vec::new();
-            let mut remaining = self.init(&mut links, &worker);
+            let mut remaining = links.len();
             while remaining > 0 {
                 match receiver.recv().unwrap() {
                     Ok(new_links) => {
@@ -146,8 +145,8 @@ mod tests {
         assert_eq!(
             links,
             [
-                String::from("http://internal.com/abs"),
-                String::from("http://internal.com/rel")
+                "http://internal.com/abs".to_string(),
+                "http://internal.com/rel".to_string(),
             ]
             .iter()
             .cloned()
@@ -265,11 +264,11 @@ mod tests {
         assert_eq!(
             links,
             [
-                String::from("http://internal.com/"),
-                String::from("http://internal.com/abs"),
-                String::from("http://internal.com/rel"),
-                String::from("http://internal.com/abs_second"),
-                String::from("http://internal.com/rel_second"),
+                "http://internal.com/".to_string(),
+                "http://internal.com/abs".to_string(),
+                "http://internal.com/rel".to_string(),
+                "http://internal.com/abs_second".to_string(),
+                "http://internal.com/rel_second".to_string(),
             ]
             .iter()
             .cloned()
