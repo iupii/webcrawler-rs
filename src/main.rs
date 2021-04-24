@@ -1,4 +1,4 @@
-#![warn(missing_debug_implementations, rust_2018_idioms)]
+#![warn(rust_2018_idioms)]
 use clap::{value_t_or_exit, App, Arg};
 use url::Url;
 
@@ -11,7 +11,7 @@ mod http_client;
 fn main() {
     let args = App::new("webcrawler")
         .version("0.1.0")
-        .about("searches for patterns")
+        .about("Web crawler")
         .arg(
             Arg::with_name("url")
                 .short("u")

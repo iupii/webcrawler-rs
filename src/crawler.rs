@@ -42,7 +42,7 @@ impl Crawler {
         for link in links {
             println!("\t{:?}", link);
         }
-        if fails.len() > 0 {
+        if !fails.is_empty() {
             println!("\nwith fails {:?}:", fails.len());
             for (link, err) in fails {
                 println!("\t{:?}: {:?}", link, err);
@@ -123,7 +123,6 @@ pub fn get_internal_links(base: &Url, html: &str) -> HashSet<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use url::Url;
 
     #[test]
     fn check_get_internal_links() {
@@ -259,7 +258,7 @@ mod tests {
         );
         let url = Url::parse("http://internal.com").unwrap();
         let (links, fails) = Crawler::new(url, 5).crawl(&MockHttpClient { documents });
-        assert_eq!(fails.len(), 0);
+        assert!(fails.is_empty());
         assert_eq!(links.len(), 5);
         assert_eq!(
             links,
