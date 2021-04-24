@@ -23,14 +23,16 @@ impl Crawler {
     }
 
     fn init(&self, links: &mut HashSet<String>, worker: &Worker<String>) -> i32 {
-        let base = String::from(self.base.as_str());
-        worker.push(base.clone());
-        links.insert(base);
+        let url = String::from(self.base.as_str());
+        worker.push(url.clone());
+        links.insert(url);
         let mut remaining = 1;
-        if self.base.path() != "/" {
-            let base = String::from(self.base.join("/").unwrap().as_str());
-            worker.push(base.clone());
-            links.insert(base);
+        if self.base.path() != "/" || self.base.query().is_some() {
+            let mut url = self.base.join("/").unwrap();
+            url.set_query(None);
+            let url = url.into_string();
+            worker.push(url.clone());
+            links.insert(url);
             remaining += 1;
         }
         remaining

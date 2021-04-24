@@ -33,9 +33,10 @@ fn main() {
     let url = args.value_of("url").unwrap();
     let limit: usize = value_t_or_exit!(args, "limit", usize);
 
-    let url = Url::parse(url).unwrap_or_else(|e| {
+    let mut url = Url::parse(url).unwrap_or_else(|e| {
         panic!("error: {}", e);
     });
+    url.set_fragment(None);
 
     let _domain = url.domain().unwrap_or_else(|| {
         panic!("error: Domain expected");
